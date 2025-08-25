@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Isla Venezuela - Productos Frescos y Especialidades Locales</title>
+    <link rel="stylesheet" href="interfaz.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div>
+                    <h1 class="title" id="title">Isla Venezuela</h1>
+                    <p class="subtitle" id="subtitle">Productos Frescos y Especialidades Locales</p>
+                </div>
+                
+                <div class="header-right">
+                    <!-- Language Selector -->
+                    <div class="language-selector">
+                        <span class="globe-icon">🌐</span>
+                        <select id="languageSelect" class="language-select">
+                            <option value="es">Español</option>
+                            <option value="en">English</option>
+                            <option value="fr">Français</option>
+                            <option value="ru">Русский</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Cart Button -->
+                    <button class="cart-btn" id="cartBtn">
+                        <span class="cart-icon">🛒</span>
+                        <span class="cart-count" id="cartCount">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search and Filters -->
+    <section class="filters-section">
+        <div class="container">
+            <div class="filters-content">
+                <div class="search-container">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Buscar productos...">
+                </div>
+                <select id="categorySelect" class="category-select">
+                    <option value="all">Todas las categorías</option>
+                    <option value="aceites">Aceites y Vinagres</option>
+                    <option value="lacteos">Lácteos</option>
+                    <option value="embutidos">Embutidos</option>
+                    <option value="vinos">Vinos y Licores</option>
+                    <option value="dulces">Dulces y Miel</option>
+                    <option value="frutos-secos">Frutos Secos</option>
+                </select>
+            </div>
+        </div>
+    </section>
+
+    <!-- Products Grid -->
+    <main class="main-content">
+        <div class="container">
+            <div class="products-grid" id="productsGrid">
+                <!-- Los productos se generarán dinámicamente con JavaScript -->
+            </div>
+            <div class="no-results" id="noResults" style="display: none;">
+                <p>No se encontraron productos que coincidan con tu búsqueda.</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeCartModal">&times;</span>
+            <h2 class="modal-title">Carrito de Compras</h2>
+            <div class="modal-body">
+                <div id="cartItems" class="cart-items">
+                    <!-- Los items del carrito se generarán dinámicamente -->
+                </div>
+                <div class="cart-total">
+                    <h3>Total: <span id="cartTotal">$0.00</span></h3>
+                </div>
+                <div class="cart-actions">
+                    <button class="clear-cart-btn" id="clearCartBtn">Vaciar Carrito</button>
+                    <button class="checkout-btn" id="checkoutBtn">Finalizar Compra</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="contact-info">
+                    <h3 class="contact-title" id="contactTitle">Contacto</h3>
+                    <div class="contact-item">
+                        <span class="contact-icon">📍</span>
+                        <span id="address">Calle Principal 123, Centro Histórico</span>
+                    </div>
+                    <div class="contact-item">
+                        <span class="contact-icon">📞</span>
+                        <span id="phone">+34 123 456 789</span>
+                    </div>
+                </div>
+                <div class="footer-text">
+                    <p id="footerText">© 2024 Isla Venezuela. Productos frescos para turistas.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+      // Datos de productos (fácil de editar)
+const products = [
+  {
+    id: 1,
+    name: {
+      es: "Aceite de Oliva Extra Virgen",
+      en: "Extra Virgin Olive Oil",
+      fr: "Huile d'Olive Extra Vierge",
+      ru: "Оливковое масло экстра вирджин",
+    },
+    category: "aceites",
+    price: 12.5,
+    image: "olive-oil-bottle.png",
+    description: {
+      es: "Aceite de oliva premium de producción local",
+      en: "Premium locally produced olive oil",
+      fr: "Huile d'olive premium de production locale",
+      ru: "Премиальное оливковое масло местного производства",
+    },
+  },
+  {
+    id: 2,
+    name: {
+      es: "Queso Manchego Artesanal",
+      en: "Artisan Manchego Cheese",
+      fr: "Fromage Manchego Artisanal",
+      ru: "Ремесленный сыр Манчего",
+    },
+    category: "lacteos",
+    price: 18.9,
+    image: "manchego-cheese-wheel.png",
+    description: {
+      es: "Queso curado tradicional de oveja",
+      en: "Traditional cured sheep cheese",
+      fr: "Fromage de brebis affiné traditionnel",
+      ru: "Традиционный выдержанный овечий сыр",
+    },
+  },
+  {
+    id: 3,
+    name: {
+      es: "Jamón Ibérico de Bellota",
+      en: "Acorn-fed Iberian Ham",
+      fr: "Jambon Ibérique de Bellota",
+      ru: "Иберийский хамон де бейота",
+    },
+    category: "embutidos",
+    price: 45.0,
+    image: "iberian-ham-slices.png",
+    description: {
+      es: "Jamón ibérico de la más alta calidad",
+      en: "Highest quality Iberian ham",
+      fr: "Jambon ibérique de la plus haute qualité",
+      ru: "Иберийский хамон высшего качества",
+    },
+  },
+  {
+    id: 4,
+    name: {
+      es: "Vino Tinto Reserva",
+      en: "Red Wine Reserve",
+      fr: "Vin Rouge Réserve",
+      ru: "Красное вино Резерва",
+    },
+    category: "vinos",
+    price: 25.0,
+    image: "red-wine-bottle.png",
+    description: {
+      es: "Vino tinto con denominación de origen",
+      en: "Red wine with designation of origin",
+      fr: "Vin rouge avec appellation d'origine",
+      ru: "Красное вино с наименованием по происхождению",
+    },
+  },
+  {
+    id: 5,
+    name: {
+      es: "Miel de Azahar",
+      en: "Orange Blossom Honey",
+      fr: "Miel de Fleur d'Oranger",
+      ru: "Мед из цветов апельсина",
+    },
+    category: "dulces",
+    price: 8.5,
+    image: "honey-jar-orange-blossom.png",
+    description: {
+      es: "Miel pura de flores de naranjo",
+      en: "Pure orange blossom honey",
+      fr: "Miel pur de fleurs d'oranger",
+      ru: "Чистый мед из цветов апельсина",
+    },
+  },
+  {
+    id: 6,
+    name: {
+      es: "Almendras Marcona",
+      en: "Marcona Almonds",
+      fr: "Amandes Marcona",
+      ru: "Миндаль Маркона",
+    },
+    category: "frutos-secos",
+    price: 15.75,
+    image: "marcona-almonds-bowl.png",
+    description: {
+      es: "Almendras premium tostadas con sal marina",
+      en: "Premium almonds roasted with sea salt",
+      fr: "Amandes premium grillées au sel marin",
+      ru: "Премиальный миндаль, жареный с морской солью",
+    },
+  },
+]
+
+// Categorías traducidas
+const categories = {
+  es: {
+    aceites: "Aceites y Vinagres",
+    lacteos: "Lácteos",
+    embutidos: "Embutidos",
+    vinos: "Vinos y Licores",
+    dulces: "Dulces y Miel",
+    "frutos-secos": "Frutos Secos",
+  },
+  en: {
+    aceites: "Oils & Vinegars",
+    lacteos: "Dairy Products",
+    embutidos: "Cured Meats",
+    vinos: "Wines & Spirits",
+    dulces: "Sweets & Honey",
+    "frutos-secos": "Nuts & Dried Fruits",
+  },
+  fr: {
+    aceites: "Huiles et Vinaigres",
+    lacteos: "Produits Laitiers",
+    embutidos: "Charcuterie",
+    vinos: "Vins et Spiritueux",
+    dulces: "Douceurs et Miel",
+    "frutos-secos": "Fruits Secs",
+  },
+  ru: {
+    aceites: "Масла и Уксусы",
+    lacteos: "Молочные Продукты",
+    embutidos: "Мясные Деликатесы",
+    vinos: "Вина и Спиртные Напитки",
+    dulces: "Сладости и Мед",
+    "frutos-secos": "Орехи и Сухофрукты",
+  },
+}
+
+// Traducciones de la interfaz
+const translations = {
+  es: {
+    title: "Isla Venezuela",
+    subtitle: "Productos Frescos y Especialidades Locales",
+    search: "Buscar productos...",
+    allCategories: "Todas las categorías",
+    addToCart: "Añadir al carrito",
+    contact: "Contacto",
+    address: "Calle Principal 123, Centro Histórico",
+    phone: "+34 123 456 789",
+    footer: "© 2024 Isla Venezuela. Productos frescos para turistas.",
+    noResults: "No se encontraron productos que coincidan con tu búsqueda.",
+    cartTitle: "Carrito de Compras",
+    clearCart: "Vaciar Carrito",
+    checkout: "Finalizar Compra",
+    emptyCart: "Tu carrito está vacío",
+  },
+  en: {
+    title: "Venezuela Island",
+    subtitle: "Fresh Products and Local Specialties",
+    search: "Search products...",
+    allCategories: "All categories",
+    addToCart: "Add to cart",
+    contact: "Contact",
+    address: "123 Main Street, Historic Center",
+    phone: "+34 123 456 789",
+    footer: "© 2024 Venezuela Island. Fresh products for tourists.",
+    noResults: "No products found matching your search.",
+    cartTitle: "Shopping Cart",
+    clearCart: "Clear Cart",
+    checkout: "Checkout",
+    emptyCart: "Your cart is empty",
+  },
+  fr: {
+    title: "Île Venezuela",
+    subtitle: "Produits Frais et Spécialités Locales",
+    search: "Rechercher des produits...",
+    allCategories: "Toutes les catégories",
+    addToCart: "Ajouter au panier",
+    contact: "Contact",
+    address: "123 Rue Principale, Centre Historique",
+    phone: "+34 123 456 789",
+    footer: "© 2024 Île Venezuela. Produits frais pour touristes.",
+    noResults: "Aucun produit trouvé correspondant à votre recherche.",
+    cartTitle: "Panier d'Achat",
+    clearCart: "Vider le Panier",
+    checkout: "Finaliser l'Achat",
+    emptyCart: "Votre panier est vide",
+  },
+  ru: {
+    title: "Остров Венесуэла",
+    subtitle: "Свежие Продукты и Местные Деликатесы",
+    search: "Поиск товаров...",
+    allCategories: "Все категории",
+    addToCart: "В корзину",
+    contact: "Контакты",
+    address: "Главная улица 123, Исторический центр",
+    phone: "+34 123 456 789",
+    footer: "© 2024 Остров Венесуэла. Свежие продукты для туристов.",
+    noResults: "Товары, соответствующие вашему поиску, не найдены.",
+    cartTitle: "Корзина Покупок",
+    clearCart: "Очистить Корзину",
+    checkout: "Оформить Заказ",
+    emptyCart: "Ваша корзина пуста",
+  },
+}
+
+// Variables globales
+let currentLanguage = "es"
+let currentCategory = "all"
+let currentSearch = ""
+let cart = []
+
+// Inicialización
+document.addEventListener("DOMContentLoaded", () => {
+  setupEventListeners()
+  updateLanguage()
+  renderProducts()
+  updateCartCount()
+})
+
+// Configurar event listeners
+function setupEventListeners() {
+  document.getElementById("languageSelect").addEventListener("change", (e) => {
+    currentLanguage = e.target.value
+    updateLanguage()
+    renderProducts()
+    updateCart()
+  })
+
+  document.getElementById("categorySelect").addEventListener("change", (e) => {
+    currentCategory = e.target.value
+    renderProducts()
+  })
+
+  document.getElementById("searchInput").addEventListener("input", (e) => {
+    currentSearch = e.target.value
+    renderProducts()
+  })
+
+  // Event listeners para el carrito
+  document.getElementById("cartBtn").addEventListener("click", openCartModal)
+  document.getElementById("closeCartModal").addEventListener("click", closeCartModal)
+  document.getElementById("clearCartBtn").addEventListener("click", clearCart)
+  document.getElementById("checkoutBtn").addEventListener("click", checkout)
+
+  // Cerrar modal al hacer clic fuera del contenido
+  document.getElementById("cartModal").addEventListener("click", (e) => {
+    if (e.target.id === "cartModal") {
+      closeCartModal()
+    }
+  })
+}
+
+// Actualizar idioma de la interfaz
+function updateLanguage() {
+  const t = translations[currentLanguage]
+
+  document.getElementById("title").textContent = t.title
+  document.getElementById("subtitle").textContent = t.subtitle
+  document.getElementById("searchInput").placeholder = t.search
+  document.getElementById("contactTitle").textContent = t.contact
+  document.getElementById("address").textContent = t.address
+  document.getElementById("phone").textContent = t.phone
+  document.getElementById("footerText").textContent = t.footer
+
+  // Actualizar opciones de categorías
+  updateCategoryOptions()
+}
+
+// Actualizar opciones de categorías
+function updateCategoryOptions() {
+  const categorySelect = document.getElementById("categorySelect")
+  const t = translations[currentLanguage]
+  const categoryNames = categories[currentLanguage]
+
+  categorySelect.innerHTML = `<option value="all">${t.allCategories}</option>`
+
+  Object.entries(categoryNames).forEach(([key, name]) => {
+    const option = document.createElement("option")
+    option.value = key
+    option.textContent = name
+    if (key === currentCategory) option.selected = true
+    categorySelect.appendChild(option)
+  })
+}
+
+// Renderizar productos
+function renderProducts() {
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory = currentCategory === "all" || product.category === currentCategory
+    const matchesSearch = product.name[currentLanguage].toLowerCase().includes(currentSearch.toLowerCase())
+    return matchesCategory && matchesSearch
+  })
+
+  const productsGrid = document.getElementById("productsGrid")
+  const noResults = document.getElementById("noResults")
+
+  if (filteredProducts.length === 0) {
+    productsGrid.innerHTML = ""
+    noResults.style.display = "block"
+    noResults.querySelector("p").textContent = translations[currentLanguage].noResults
+    return
+  }
+
+  noResults.style.display = "none"
+
+  productsGrid.innerHTML = filteredProducts
+    .map(
+      (product) => `
+        <div class="product-card">
+            <img src="${product.image}" alt="${product.name[currentLanguage]}" class="product-image">
+            <div class="product-content">
+                <div class="product-header">
+                    <h3 class="product-name">${product.name[currentLanguage]}</h3>
+                    <span class="product-category">${categories[currentLanguage][product.category]}</span>
+                </div>
+                <p class="product-description">${product.description[currentLanguage]}</p>
+                <div class="product-footer">
+                    <span class="product-price">$${product.price.toFixed(2)}</span>
+                    <button class="add-to-cart-btn" onclick="addToCart(${product.id})">
+                        <span class="cart-icon">🛒</span>
+                        ${translations[currentLanguage].addToCart}
+                    </button>
+                </div>
+            </div>
+        </div>
+    `,
+    )
+    .join("")
+}
+
+// Funciones del carrito
+function addToCart(productId) {
+  const product = products.find((p) => p.id === productId)
+  const existingItem = cart.find((item) => item.id === productId)
+
+  if (existingItem) {
+    existingItem.quantity += 1
+  } else {
+    cart.push({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      quantity: 1
+    })
+  }
+
+  updateCartCount()
+  showNotification(`${product.name[currentLanguage]} añadido al carrito!`)
+}
+
+function removeFromCart(productId) {
+  cart = cart.filter((item) => item.id !== productId)
+  updateCartCount()
+  updateCart()
+}
+
+function updateCartCount() {
+  const cartCount = document.getElementById("cartCount")
+  const totalItems = cart.reduce((total, item) => total + item.quantity, 0)
+  cartCount.textContent = totalItems
+}
+
+function updateCart() {
+  const cartItems = document.getElementById("cartItems")
+  const cartTotal = document.getElementById("cartTotal")
+  const t = translations[currentLanguage]
+
+  if (cart.length === 0) {
+    cartItems.innerHTML = `<p class="empty-cart">${t.emptyCart}</p>`
+    cartTotal.textContent = "$0.00"
+    return
+  }
+
+  cartItems.innerHTML = cart
+    .map(
+      (item) => `
+        <div class="cart-item">
+            <img src="${item.image}" alt="${item.name[currentLanguage]}" class="cart-item-image">
+            <div class="cart-item-details">
+                <h4 class="cart-item-name">${item.name[currentLanguage]}</h4>
+                <p class="cart-item-price">$${item.price.toFixed(2)} x ${item.quantity}</p>
+            </div>
+            <div class="cart-item-actions">
+                <button class="remove-item-btn" onclick="removeFromCart(${item.id})">🗑️</button>
+            </div>
+        </div>
+    `,
+    )
+    .join("")
+
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  cartTotal.textContent = `$${total.toFixed(2)}`
+}
+
+function openCartModal() {
+  updateCart()
+  document.getElementById("cartModal").style.display = "block"
+}
+
+function closeCartModal() {
+  document.getElementById("cartModal").style.display = "none"
+}
+
+function clearCart() {
+  cart = []
+  updateCartCount()
+  updateCart()
+  showNotification("Carrito vaciado")
+}
+
+function checkout() {
+  if (cart.length === 0) {
+    showNotification("El carrito está vacío")
+    return
+  }
+  
+  const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  alert(`¡Compra realizada! Total: $${total.toFixed(2)}`)
+  clearCart()
+  closeCartModal()
+}
+
+function showNotification(message) {
+  // Crear notificación temporal
+  const notification = document.createElement("div")
+  notification.className = "notification"
+  notification.textContent = message
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: var(--primary-color);
+    color: white;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    z-index: 1000;
+    animation: slideIn 0.3s ease;
+  `
+  
+  document.body.appendChild(notification)
+  
+  setTimeout(() => {
+    notification.remove()
+  }, 3000)
+}
+
+    </script>
+</body>
+</html>
